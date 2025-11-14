@@ -3,24 +3,24 @@
  * Using Bun's built-in SQLite (faster and native!)
  */
 
-import { Database } from 'bun:sqlite';
-import { homedir } from 'node:os';
-import { join } from 'node:path';
+import { Database } from "bun:sqlite";
+import { homedir } from "node:os";
+import { join } from "node:path";
 
-const DB_PATH = join(homedir(), '.dev/logs/observability.db');
+const DB_PATH = join(homedir(), ".dev/logs/observability.db");
 
 export class PicardDB {
-  private db: Database;
+	private db: Database;
 
-  constructor(dbPath: string = DB_PATH) {
-    this.db = new Database(dbPath);
-  }
+	constructor(dbPath: string = DB_PATH) {
+		this.db = new Database(dbPath);
+	}
 
-  // Get active agents
-  getActiveAgents() {
-    return this.db
-      .prepare(
-        `
+	// Get active agents
+	getActiveAgents() {
+		return this.db
+			.prepare(
+				`
       SELECT
         a.agent_id,
         a.agent_name,
@@ -36,16 +36,16 @@ export class PicardDB {
       WHERE a.status IN ('active', 'idle', 'busy')
       GROUP BY a.agent_id
       ORDER BY a.agent_type, a.status DESC
-    `
-      )
-      .all();
-  }
+    `,
+			)
+			.all();
+	}
 
-  // Get ROI metrics
-  getROIMetrics() {
-    const result = this.db
-      .prepare(
-        `
+	// Get ROI metrics
+	getROIMetrics() {
+		const result = this.db
+			.prepare(
+				`
       SELECT
         COUNT(DISTINCT t.task_id) as tasks_completed,
         SUM(tu.total_tokens) as total_tokens,
@@ -56,76 +56,78 @@ export class PicardDB {
       LEFT JOIN token_usage tu ON t.task_id = tu.task_id
       WHERE DATE(t.completed_at) = DATE('now')
         AND t.outcome = 'success'
-    `
-      )
-      .get() as any;
+    `,
+			)
+			.get() as any;
 
-    return {
-      tasks_completed: result?.tasks_completed || 0,
-      total_tokens: result?.total_tokens || 0,
-      total_cost: result?.total_cost || 0,
-      lines_delivered: result?.total_lines || 0,
-      files_delivered: result?.total_files || 0,
-      cost_per_task:
-        result?.tasks_completed > 0 ? result.total_cost / result.tasks_completed : 0,
-      lines_per_dollar:
-        result?.total_cost > 0 ? result.total_lines / result.total_cost : 0,
-    };
-  }
+		return {
+			tasks_completed: result?.tasks_completed || 0,
+			total_tokens: result?.total_tokens || 0,
+			total_cost: result?.total_cost || 0,
+			lines_delivered: result?.total_lines || 0,
+			files_delivered: result?.total_files || 0,
+			cost_per_task:
+				result?.tasks_completed > 0
+					? result.total_cost / result.tasks_completed
+					: 0,
+			lines_per_dollar:
+				result?.total_cost > 0 ? result.total_lines / result.total_cost : 0,
+		};
+	}
 
-  // Get quality gates status
-  getQualityGates() {
-    const successRate = this.db
-      .prepare(
-        `
+	// Get quality gates status
+	getQualityGates() {
+		const successRate = this.db
+			.prepare(
+				`
       SELECT
         CAST(SUM(CASE WHEN outcome = 'success' THEN 1 ELSE 0 END) AS FLOAT) / COUNT(*) as rate
       FROM tasks
       WHERE completed_at > datetime('now', '-1 hour')
-    `
-      )
-      .get() as any;
+    `,
+			)
+			.get() as any;
 
-    const errorRate = this.db
-      .prepare(
-        `
+		const errorRate = this.db
+			.prepare(
+				`
       SELECT
         CAST(COUNT(CASE WHEN event_type LIKE '%.failed' THEN 1 END) AS FLOAT) / COUNT(*) as rate
       FROM events
       WHERE timestamp > datetime('now', '-1 hour')
-    `
-      )
-      .get() as any;
+    `,
+			)
+			.get() as any;
 
-    const success = successRate?.rate || 0;
-    const error = errorRate?.rate || 0;
+		const success = successRate?.rate || 0;
+		const error = errorRate?.rate || 0;
 
-    return {
-      success_rate: success,
-      error_rate: error,
-      quality_passing: success > 0.8 && error < 0.15,
-    };
-  }
+		return {
+			success_rate: success,
+			error_rate: error,
+			quality_passing: success > 0.8 && error < 0.15,
+		};
+	}
 
-  // Get recent events
-  getRecentEvents(limit: number = 10) {
-    return this.db
-      .prepare(
-        `
+	// Get recent events
+	getRecentEvents(limit: number = 10) {
+		return this.db
+			.prepare(
+				`
       SELECT timestamp, agent_id, event_type, project
       FROM events
       ORDER BY id DESC
       LIMIT ?
-    `
-      )
-      .all(limit);
-  }
+    `,
+			)
+			.all(limit);
+	}
 
-  // Get active tasks
-  getActiveTasks() {
-    return this.db
-      .prepare(
-        `
+	// Get active tasks
+	getActiveTasks() {
+		return this.db
+			.prepare(
+				`
       SELECT task_id, task_name, agent_id, status, priority
       FROM tasks
       WHERE status IN ('pending', 'claimed', 'in_progress')
@@ -137,22 +139,26 @@ export class PicardDB {
           ELSE 4
         END
       LIMIT 10
-    `
-      )
-      .all();
-  }
+    `,
+			)
+			.all();
+	}
 
-  // Get all projects
-  getProjects() {
-    return this.db.prepare(`SELECT * FROM v_project_dashboard ORDER BY last_activity DESC`).all();
-  }
+	// Get all projects
+	getProjects() {
+		return this.db
+			.prepare(`SELECT * FROM v_project_dashboard ORDER BY last_activity DESC`)
+			.all();
+	}
 
-  // Get all loadouts
-  getLoadouts() {
-    return this.db.prepare(`SELECT * FROM v_loadout_performance ORDER BY times_used DESC`).all();
-  }
+	// Get all loadouts
+	getLoadouts() {
+		return this.db
+			.prepare(`SELECT * FROM v_loadout_performance ORDER BY times_used DESC`)
+			.all();
+	}
 
-  close() {
-    this.db.close();
-  }
+	close() {
+		this.db.close();
+	}
 }
