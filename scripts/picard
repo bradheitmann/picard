@@ -168,7 +168,7 @@ def create_header():
     header_text = Text()
     header_text.append(PICARD_BANNER, style="bold red")
     header_text.append("\n")
-    header_text.append("Real-Time Agent Orchestration & Observability", style="gold italic")
+    header_text.append("Real-Time Agent Orchestration & Observability", style="bright_yellow italic")
 
     return Panel(
         Align.center(header_text),
@@ -219,7 +219,7 @@ def create_agents_panel(picard):
             str(failed or 0)
         )
 
-    return Panel(table, title="[bold gold]🤖 AGENT FLEET[/bold gold]", border_style="red")
+    return Panel(table, title="[bold bright_yellow]🤖 AGENT FLEET[/bold bright_yellow]", border_style="red")
 
 def create_roi_panel(picard):
     """Create ROI metrics panel"""
@@ -239,7 +239,7 @@ def create_roi_panel(picard):
     if roi['lines_per_dollar'] > 0:
         grid.add_row("📈 Lines/$:", f"[green bold]{roi['lines_per_dollar']:.0f}[/green bold]")
 
-    return Panel(grid, title="[bold gold]💰 ROI METRICS (24H)[/bold gold]", border_style="gold")
+    return Panel(grid, title="[bold bright_yellow]💰 ROI METRICS (24H)[/bold bright_yellow]", border_style="bright_yellow")
 
 def create_context_panel(picard):
     """Create context management panel"""
@@ -320,7 +320,7 @@ def create_quality_gates_panel(picard):
     grid.add_row("", "")
     grid.add_row("Quality Gates:", status)
 
-    return Panel(grid, title="[bold gold]🎯 QUALITY GATES[/bold gold]", border_style="gold")
+    return Panel(grid, title="[bold bright_yellow]🎯 QUALITY GATES[/bold bright_yellow]", border_style="bright_yellow")
 
 def create_tasks_panel(picard):
     """Create active tasks panel with priority"""
@@ -431,7 +431,7 @@ def create_events_stream_panel(picard):
 
     content = "\n".join(lines) if lines else "[dim]Waiting for events...[/dim]"
 
-    return Panel(content, title="[bold gold]📊 LIVE EVENT STREAM[/bold gold]", border_style="gold", height=10)
+    return Panel(content, title="[bold bright_yellow]📊 LIVE EVENT STREAM[/bold bright_yellow]", border_style="bright_yellow", height=10)
 
 def create_layout():
     """Create dashboard layout"""
@@ -523,7 +523,7 @@ def main():
                 live.update(render_dashboard(picard))
                 time.sleep(1.0)
     except KeyboardInterrupt:
-        console.print("\n\n[bold gold]✓ PICARD standing down. Make it so.[/bold gold]")
+        console.print("\n\n[bold bright_yellow]✓ PICARD standing down. Make it so.[/bold bright_yellow]")
         picard.conn.close()
     except Exception as e:
         console.print(f"\n[red]✗ Error: {e}[/red]")
