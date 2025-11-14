@@ -119,17 +119,15 @@ sqlite3 ~/.dev/logs/observability.db < ~/.dev/observability/schema.sql
 
 ## Quick Start
 
-### 1. Start Infrastructure (30 seconds)
+### Just Type One Command
 
 ```bash
-# Terminal 1: Event Collector
-~/.dev/observability/event-collector.py
-
-# Terminal 2: PICARD Dashboard
 picard
 ```
 
-### 2. Deploy Agent (1 minute)
+**That's it!** PICARD auto-starts the event collector if needed.
+
+### Deploy Your First Agent
 
 ```bash
 # Terminal 3
