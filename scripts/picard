@@ -6,12 +6,11 @@ Production-grade multi-agent orchestration command center
 """
 
 import sqlite3
-import json
 import sys
 import time
 import subprocess
 from pathlib import Path
-from datetime import datetime, timedelta
+from datetime import datetime
 from rich.console import Console
 from rich.live import Live
 from rich.layout import Layout
@@ -19,9 +18,7 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 from rich.align import Align
-from rich.columns import Columns
 from rich import box
-from rich.progress import Progress, BarColumn, TextColumn, SpinnerColumn
 
 # Paths
 DEV_HOME = Path.home() / ".dev"
@@ -171,7 +168,7 @@ def create_header():
     header_text = Text()
     header_text.append(PICARD_BANNER, style="bold cyan")
     header_text.append("\n")
-    header_text.append("Real-Time Agent Orchestration & Observability", style="dim italic", justify="center")
+    header_text.append("Real-Time Agent Orchestration & Observability", style="dim italic")
 
     return Panel(
         Align.center(header_text),
@@ -328,8 +325,8 @@ def create_quality_gates_panel(picard):
 def create_tasks_panel(picard):
     """Create active tasks panel with priority"""
     tasks = picard.conn.cursor().execute("""
-        SELECT task_id, task_name, assigned_agent_id, status, priority
-        FROM task_queue
+        SELECT task_id, task_name, agent_id, status, priority
+        FROM tasks
         WHERE status IN ('pending', 'assigned', 'in_progress')
         ORDER BY
             CASE priority
@@ -415,7 +412,7 @@ def create_events_stream_panel(picard):
         try:
             dt = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
             time_str = dt.strftime("%H:%M:%S")
-        except:
+        except (ValueError, AttributeError):
             time_str = "??:??:??"
 
         event_emoji = {
@@ -502,7 +499,7 @@ def main():
         result = subprocess.run(['pgrep', '-f', 'event-collector.py'],
                               capture_output=True, text=True)
         collector_running = bool(result.stdout.strip())
-    except:
+    except (FileNotFoundError, subprocess.SubprocessError, OSError):
         collector_running = False
 
     if not collector_running:
