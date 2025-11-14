@@ -164,16 +164,16 @@ class Picard:
         }
 
 def create_header():
-    """Create PICARD header with ASCII art"""
+    """Create PICARD header with ASCII art - Captain's red uniform colors"""
     header_text = Text()
-    header_text.append(PICARD_BANNER, style="bold cyan")
+    header_text.append(PICARD_BANNER, style="bold red")
     header_text.append("\n")
-    header_text.append("Real-Time Agent Orchestration & Observability", style="dim italic")
+    header_text.append("Real-Time Agent Orchestration & Observability", style="gold italic")
 
     return Panel(
         Align.center(header_text),
         box=box.DOUBLE_EDGE,
-        border_style="bright_cyan",
+        border_style="bright_red",
         padding=(0, 2)
     )
 
@@ -219,7 +219,7 @@ def create_agents_panel(picard):
             str(failed or 0)
         )
 
-    return Panel(table, title="[bold green]🤖 AGENT FLEET[/bold green]", border_style="green")
+    return Panel(table, title="[bold gold]🤖 AGENT FLEET[/bold gold]", border_style="red")
 
 def create_roi_panel(picard):
     """Create ROI metrics panel"""
@@ -239,7 +239,7 @@ def create_roi_panel(picard):
     if roi['lines_per_dollar'] > 0:
         grid.add_row("📈 Lines/$:", f"[green bold]{roi['lines_per_dollar']:.0f}[/green bold]")
 
-    return Panel(grid, title="[bold yellow]💰 ROI METRICS (24H)[/bold yellow]", border_style="yellow")
+    return Panel(grid, title="[bold gold]💰 ROI METRICS (24H)[/bold gold]", border_style="gold")
 
 def create_context_panel(picard):
     """Create context management panel"""
@@ -279,7 +279,7 @@ def create_context_panel(picard):
             usage_display
         )
 
-    return Panel(table, title="[bold blue]🧠 CONTEXT MANAGEMENT[/bold blue]", border_style="blue")
+    return Panel(table, title="[bold bright_red]🧠 CONTEXT MANAGEMENT[/bold bright_red]", border_style="red")
 
 def create_quality_gates_panel(picard):
     """Create quality gates status panel"""
@@ -320,7 +320,7 @@ def create_quality_gates_panel(picard):
     grid.add_row("", "")
     grid.add_row("Quality Gates:", status)
 
-    return Panel(grid, title="[bold magenta]🎯 QUALITY GATES[/bold magenta]", border_style="magenta")
+    return Panel(grid, title="[bold gold]🎯 QUALITY GATES[/bold gold]", border_style="gold")
 
 def create_tasks_panel(picard):
     """Create active tasks panel with priority"""
@@ -368,9 +368,9 @@ def create_tasks_panel(picard):
         )
 
     if not tasks:
-        return Panel("[dim italic]No active tasks[/dim italic]", title="[bold yellow]📋 TASK QUEUE[/bold yellow]", border_style="yellow")
+        return Panel("[dim italic]No active tasks[/dim italic]", title="[bold bright_red]📋 TASK QUEUE[/bold bright_red]", border_style="red")
 
-    return Panel(table, title="[bold yellow]📋 TASK QUEUE[/bold yellow]", border_style="yellow")
+    return Panel(table, title="[bold bright_red]📋 TASK QUEUE[/bold bright_red]", border_style="red")
 
 def create_teams_panel(picard):
     """Create team performance panel"""
@@ -431,7 +431,7 @@ def create_events_stream_panel(picard):
 
     content = "\n".join(lines) if lines else "[dim]Waiting for events...[/dim]"
 
-    return Panel(content, title="[bold blue]📊 LIVE EVENT STREAM[/bold blue]", border_style="blue", height=10)
+    return Panel(content, title="[bold gold]📊 LIVE EVENT STREAM[/bold gold]", border_style="gold", height=10)
 
 def create_layout():
     """Create dashboard layout"""
@@ -514,7 +514,7 @@ def main():
 
     picard = Picard()
 
-    console.print("[green]🖖 PICARD initializing...[/green]\n")
+    console.print("[bold red]🖖 PICARD initializing...[/bold red]\n")
     time.sleep(0.5)
 
     try:
@@ -523,7 +523,7 @@ def main():
                 live.update(render_dashboard(picard))
                 time.sleep(1.0)
     except KeyboardInterrupt:
-        console.print("\n\n[green]✓ PICARD standing down. Make it so.[/green]")
+        console.print("\n\n[bold gold]✓ PICARD standing down. Make it so.[/bold gold]")
         picard.conn.close()
     except Exception as e:
         console.print(f"\n[red]✗ Error: {e}[/red]")
