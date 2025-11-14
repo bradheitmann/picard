@@ -33,8 +33,10 @@ export interface Task {
 	task_id: string;
 	task_name: string;
 	agent_id: string | null;
+	session_id: string;
 	status: string;
 	priority: string | null;
+	claimed_at: string | null;
 }
 
 export interface Event {
@@ -56,6 +58,17 @@ export interface TeamPerformance {
 	team_size: number;
 	tasks_completed: number;
 	avg_task_time_sec: number;
+}
+
+export interface Team {
+	team_id: string;
+	team_name: string;
+	coordination_strategy: string;
+	active: number;
+}
+
+export interface TeamMemberCount {
+	count: number;
 }
 
 export interface Project {
@@ -85,6 +98,27 @@ export interface Loadout {
 	negative_observations: number;
 }
 
+export interface Protocol {
+	protocol_id: string;
+	protocol_name: string;
+	version: string;
+	description: string | null;
+	category: string | null;
+	status: string;
+	times_applied: number;
+	success_rate: number | null;
+}
+
+export interface Hack {
+	hack_id: number;
+	category: string;
+	title: string;
+	command: string;
+	description: string | null;
+	platform: string | null;
+	times_used: number;
+}
+
 export interface DashboardData {
 	agents: Agent[];
 	roi: ROIMetrics;
@@ -95,4 +129,6 @@ export interface DashboardData {
 	teams: TeamPerformance[];
 	projects: Project[];
 	loadouts: Loadout[];
+	protocols: Protocol[];
+	hacks: Hack[];
 }

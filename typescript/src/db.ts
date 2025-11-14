@@ -10,8 +10,10 @@ import type {
 	Agent,
 	ContextUsage,
 	Event,
+	Hack,
 	Loadout,
 	Project,
+	Protocol,
 	QualityGates,
 	ROIMetrics,
 	Task,
@@ -214,6 +216,22 @@ export class PicardDB {
 		return this.db
 			.prepare(`SELECT * FROM v_loadout_performance ORDER BY times_used DESC`)
 			.all() as Loadout[];
+	}
+
+	// Get all protocols
+	getProtocols(): Protocol[] {
+		return this.db
+			.prepare(
+				`SELECT * FROM protocols WHERE status = 'active' ORDER BY times_applied DESC`,
+			)
+			.all() as Protocol[];
+	}
+
+	// Get all hacks
+	getHacks(): Hack[] {
+		return this.db
+			.prepare(`SELECT * FROM hacks ORDER BY times_used DESC, category ASC`)
+			.all() as Hack[];
 	}
 
 	close() {

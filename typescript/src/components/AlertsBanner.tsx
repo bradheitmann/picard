@@ -40,8 +40,8 @@ export const AlertsBanner: FC<AlertsBannerProps> = ({ gates, context }) => {
 				<Text color="red" bold>
 					🚨 ALERTS ({alerts.length})
 				</Text>
-				{alerts.map((alert, i) => (
-					<Text key={i} color="red">
+				{alerts.map((alert) => (
+					<Text key={alert} color="red">
 						{alert}
 					</Text>
 				))}

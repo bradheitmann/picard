@@ -10,9 +10,11 @@ import { PicardDB } from "../db.js";
 import type { DashboardData } from "../types.js";
 import { AgentsView } from "./AgentsView.js";
 import { AlertsBanner } from "./AlertsBanner.js";
+import { HacksView } from "./HacksView.js";
 import { HelpModal } from "./HelpModal.js";
 import { LoadoutsView } from "./LoadoutsView.js";
 import { ProjectsView } from "./ProjectsView.js";
+import { ProtocolsView } from "./ProtocolsView.js";
 
 const BANNER = `
     ██████╗ ██╗ ██████╗ █████╗ ██████╗ ██████╗
@@ -67,6 +69,8 @@ export const Dashboard: FC = () => {
 					teams: db.getTeamPerformance(),
 					projects: db.getProjects(),
 					loadouts: db.getLoadouts(),
+					protocols: db.getProtocols(),
+					hacks: db.getHacks(),
 				});
 			} catch (error) {
 				console.error("Error fetching data:", error);
@@ -150,16 +154,8 @@ export const Dashboard: FC = () => {
 			{currentView === "agents" && <AgentsView data={data} />}
 			{currentView === "projects" && <ProjectsView data={data} />}
 			{currentView === "loadouts" && <LoadoutsView data={data} />}
-			{currentView === "protocols" && (
-				<Box padding={2}>
-					<Text color="yellow">Protocols view coming soon...</Text>
-				</Box>
-			)}
-			{currentView === "hacks" && (
-				<Box padding={2}>
-					<Text color="yellow">Hacks view coming soon...</Text>
-				</Box>
-			)}
+			{currentView === "protocols" && <ProtocolsView data={data} />}
+			{currentView === "hacks" && <HacksView data={data} />}
 
 			{/* Help Modal */}
 			{showHelp && <HelpModal onClose={() => setShowHelp(false)} />}

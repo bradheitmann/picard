@@ -9,6 +9,7 @@ import { execSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { Command } from "commander";
 import { PicardDB } from "./db.js";
+import type { Task, Team, TeamMemberCount } from "./types.js";
 
 const program = new Command();
 const db = new PicardDB();
@@ -141,7 +142,7 @@ taskCmd
 		if (Array.isArray(tasks) && tasks.length > 0) {
 			console.log("\n📋 Tasks:\n");
 			for (const task of tasks) {
-				const t = task as any;
+				const t = task as Task;
 				console.log(`  ${t.task_id}`);
 				console.log(`    Name: ${t.task_name}`);
 				console.log(
@@ -212,12 +213,12 @@ teamCmd
 		if (Array.isArray(teams) && teams.length > 0) {
 			console.log("\n👥 Teams:\n");
 			for (const team of teams) {
-				const t = team as any;
+				const t = team as Team;
 				const members = db.db
 					.prepare(
 						"SELECT COUNT(*) as count FROM team_members WHERE team_id = ?",
 					)
-					.get(t.team_id) as any;
+					.get(t.team_id) as TeamMemberCount;
 
 				console.log(`  ${t.team_name} (${t.team_id})`);
 				console.log(`    Strategy: ${t.coordination_strategy}`);
