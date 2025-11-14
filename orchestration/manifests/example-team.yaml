@@ -1,0 +1,194 @@
+# Specialized Agent Team Deployment Manifest
+# Deploy multiple specialized agents for coordinated development
+
+version: "1.0.0"
+deployment_name: "specialized-dev-team"
+
+# Team configuration
+team:
+  id: "team-alpha"
+  name: "Specialized Development Team"
+  strategy: "leader-follower"          # leader-follower, peer-to-peer, hierarchical
+  coordination: "task-queue"           # task-queue, direct-message, shared-state
+
+# Agent definitions
+agents:
+  # Frontend Specialist
+  - id: "frontend-specialist-001"
+    name: "Frontend Specialist"
+    type: "specialist"
+    role: "lead"
+    platform: "claude-code"
+    specialization:
+      - react
+      - typescript
+      - tailwind
+      - component-development
+    skills:
+      - read
+      - write
+      - edit
+      - bash
+    context_budget:
+      max_tokens: 100000
+      reserved_pct: 30                # Reserve 30% for system/coordination
+    cost_budget:
+      max_usd_per_day: 5.00
+    quality_gates:
+      - no_typescript_errors
+      - passes_biome_check
+      - component_tests_pass
+    constitution: "agents/constitutions/frontend-specialist.md"
+
+  # Backend Specialist
+  - id: "backend-specialist-001"
+    name: "Backend Specialist"
+    type: "specialist"
+    platform: "cursor"
+    specialization:
+      - api-development
+      - database-design
+      - edge-functions
+      - supabase
+    skills:
+      - read
+      - write
+      - edit
+      - bash
+    context_budget:
+      max_tokens: 100000
+      reserved_pct: 25
+    cost_budget:
+      max_usd_per_day: 5.00
+    quality_gates:
+      - api_tests_pass
+      - no_sql_injection_vulnerabilities
+      - rls_policies_validated
+
+  # Testing Specialist
+  - id: "testing-specialist-001"
+    name: "Testing Specialist"
+    type: "specialist"
+    platform: "cursor"
+    specialization:
+      - vitest
+      - playwright
+      - test-driven-development
+      - coverage-analysis
+    skills:
+      - read
+      - write
+      - bash
+    context_budget:
+      max_tokens: 75000
+      reserved_pct: 20
+    cost_budget:
+      max_usd_per_day: 3.00
+    quality_gates:
+      - test_coverage_above_80_pct
+      - all_tests_pass
+
+  # Code Reviewer
+  - id: "code-reviewer-001"
+    name: "Code Reviewer"
+    type: "reviewer"
+    platform: "claude-code"
+    specialization:
+      - code-review
+      - security-audit
+      - performance-analysis
+      - best-practices
+    skills:
+      - read
+      - bash
+    context_budget:
+      max_tokens: 150000              # Reviewers need more context
+      reserved_pct: 40
+    cost_budget:
+      max_usd_per_day: 7.00
+    quality_gates:
+      - no_critical_issues_found
+
+  # Documentation Specialist
+  - id: "docs-specialist-001"
+    name: "Documentation Specialist"
+    type: "specialist"
+    platform: "warp"
+    specialization:
+      - technical-writing
+      - api-documentation
+      - readme-generation
+      - comment-generation
+    skills:
+      - read
+      - write
+    context_budget:
+      max_tokens: 50000
+      reserved_pct: 15
+    cost_budget:
+      max_usd_per_day: 2.00
+
+# Deployment configuration
+deployment:
+  target_projects:
+    - path: "/Users/YOUR_USERNAME/path/to/your/project"
+      agents: ["frontend-specialist-001", "testing-specialist-001", "docs-specialist-001"]
+
+  auto_activate: true
+  health_check_interval_sec: 60
+  restart_on_failure: true
+  max_restarts: 3
+
+# Task routing rules
+task_routing:
+  - task_type: "component-development"
+    assign_to: "frontend-specialist-001"
+    priority: "high"
+
+  - task_type: "api-endpoint"
+    assign_to: "backend-specialist-001"
+    priority: "high"
+
+  - task_type: "write-tests"
+    assign_to: "testing-specialist-001"
+    priority: "medium"
+
+  - task_type: "code-review"
+    assign_to: "code-reviewer-001"
+    priority: "high"
+
+  - task_type: "documentation"
+    assign_to: "docs-specialist-001"
+    priority: "low"
+
+# Coordination rules
+coordination:
+  handoff_protocol:
+    - from: "frontend-specialist-001"
+      to: "testing-specialist-001"
+      trigger: "task.completed"
+      condition: "task_type == 'component-development'"
+
+    - from: "*"
+      to: "code-reviewer-001"
+      trigger: "task.completed"
+      condition: "files_modified > 5"
+
+  conflict_resolution: "leader-decides"  # leader-decides, manual, automated
+
+  communication_channel: "event-stream"  # event-stream, shared-file, api
+
+# Monitoring
+monitoring:
+  enable_real_time_dashboard: true
+  alert_on_agent_down: true
+  alert_on_quality_gate_failure: true
+  alert_on_budget_exceeded: true
+  metrics_retention_days: 30
+
+# Budget controls
+budget:
+  total_max_usd_per_day: 25.00
+  alert_at_pct: 80
+  hard_stop_at_pct: 100
+  token_efficiency_target: 1000  # tokens per task

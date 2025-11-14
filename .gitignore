@@ -1,0 +1,53 @@
+# PICARD .gitignore - Security First
+
+# Logs and databases (NEVER commit)
+logs/
+*.db
+*.db-journal
+*.log
+*.jsonl
+
+# Configuration files with secrets
+config/config.yaml
+!config/config.yaml.example
+secrets/
+.env
+.env.*
+
+# Personal information
+agents/*/[!template]*
+!agents/constitutions/template.md
+orchestration/manifests/[!example]*
+!orchestration/manifests/example-team.yaml
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# Temporary
+*.tmp
+*.temp
+.cache/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/

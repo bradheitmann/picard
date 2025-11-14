@@ -1,0 +1,116 @@
+# PICARD Configuration Example
+# Copy this to ~/.dev/config.yaml and customize
+
+version: "1.0.0"
+
+# Global settings
+settings:
+  default_agent: "claude-code"
+  auto_harvest_insights: true
+  log_all_agent_activity: true
+  playbook_versioning: true
+
+# Supported agents
+agents:
+  - name: "claude-code"
+    type: "ai-assistant"
+    active: true
+    log_format: "jsonl"
+  - name: "cursor"
+    type: "ai-assistant"
+    active: false
+    log_format: "jsonl"
+  - name: "github-copilot"
+    type: "ai-assistant"
+    active: false
+    log_format: "jsonl"
+  - name: "human"
+    type: "developer"
+    active: true
+    log_format: "markdown"
+
+# Project registry (auto-synced)
+project_registry: "~/.warp/PSA_PROJECTS.md"
+
+# Playbook categories
+playbook_categories:
+  - frontend
+  - backend
+  - testing
+  - deployment
+  - agent-coordination
+  - architecture
+  - security
+  - performance
+
+# Insight harvesting rules
+insight_harvesting:
+  sources:
+    - "docs/PROJECT_STATE.md"
+    - "docs/AGENTS.md"
+    - "docs/AGENT_ACTIVITY.jsonl"
+  patterns:
+    - "Architecture Decision Records"
+    - "Lessons Learned"
+    - "Best Practices"
+    - "What Worked"
+    - "What Didn't Work"
+
+# Protocol library
+protocols:
+  auto_version: true
+  format: "markdown"
+  require_validation: false
+
+# Orchestration settings
+orchestration:
+  event_collection_server:
+    enabled: true
+    host: "localhost"
+    port: 8765
+    protocol: "http"
+
+  task_queue:
+    backend: "sqlite"
+    retry_limit: 3
+    timeout_seconds: 3600
+
+  monitoring:
+    health_check_interval_seconds: 60
+    alert_threshold_error_rate: 0.15
+
+# Platform bridge configuration
+platforms:
+  claude_code:
+    enabled: true
+    bridge: "filesystem"
+    config_path: ".claude/"
+
+  cursor:
+    enabled: false
+    bridge: "extension"
+    extension_port: 9876
+
+  warp:
+    enabled: false
+    bridge: "cli"
+
+  github:
+    enabled: false
+    bridge: "actions"
+    # Set your GitHub App ID
+    # app_id: "your-app-id"
+
+# Budget controls (optional)
+budget:
+  enabled: false
+  total_max_usd_per_day: 25.00
+  alert_at_pct: 80
+  hard_stop_at_pct: 100
+
+# Quality gates (optional)
+quality_gates:
+  enabled: true
+  min_success_rate: 0.80
+  max_error_rate: 0.15
+  min_test_coverage: 0.70
