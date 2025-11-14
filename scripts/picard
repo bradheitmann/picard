@@ -481,9 +481,9 @@ def render_dashboard(picard):
     footer = Text()
     footer.append(f"Last Update: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", style="dim")
     footer.append("  |  ", style="dim")
-    footer.append("DB: ", style="dim")
-    footer.append(str(DB_PATH), style="cyan dim")
-    footer.append("  |  Press ", style="dim")
+    footer.append("Help: ", style="dim")
+    footer.append("cat ~/.dev/PICARD_USER_MANUAL.md", style="cyan")
+    footer.append("  |  ", style="dim")
     footer.append("Ctrl+C", style="bold red")
     footer.append(" to exit", style="dim")
 
