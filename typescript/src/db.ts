@@ -6,8 +6,21 @@
 import { Database } from "bun:sqlite";
 import { homedir } from "node:os";
 import { join } from "node:path";
+import type { Agent, Event, QualityGates, ROIMetrics, Task } from "./types";
 
 const DB_PATH = join(homedir(), ".dev/logs/observability.db");
+
+interface ROIQueryResult {
+	tasks_completed: number | null;
+	total_tokens: number | null;
+	total_cost: number | null;
+	total_lines: number | null;
+	total_files: number | null;
+}
+
+interface RateResult {
+	rate: number | null;
+}
 
 export class PicardDB {
 	private db: Database;
@@ -17,7 +30,7 @@ export class PicardDB {
 	}
 
 	// Get active agents
-	getActiveAgents() {
+	getActiveAgents(): Agent[] {
 		return this.db
 			.prepare(
 				`
@@ -38,11 +51,11 @@ export class PicardDB {
       ORDER BY a.agent_type, a.status DESC
     `,
 			)
-			.all();
+			.all() as Agent[];
 	}
 
 	// Get ROI metrics
-	getROIMetrics() {
+	getROIMetrics(): ROIMetrics {
 		const result = this.db
 			.prepare(
 				`
@@ -58,25 +71,27 @@ export class PicardDB {
         AND t.outcome = 'success'
     `,
 			)
-			.get() as any;
+			.get() as ROIQueryResult | undefined;
 
 		return {
-			tasks_completed: result?.tasks_completed || 0,
-			total_tokens: result?.total_tokens || 0,
-			total_cost: result?.total_cost || 0,
-			lines_delivered: result?.total_lines || 0,
-			files_delivered: result?.total_files || 0,
+			tasks_completed: result?.tasks_completed ?? 0,
+			total_tokens: result?.total_tokens ?? 0,
+			total_cost: result?.total_cost ?? 0,
+			lines_delivered: result?.total_lines ?? 0,
+			files_delivered: result?.total_files ?? 0,
 			cost_per_task:
-				result?.tasks_completed > 0
+				result?.tasks_completed && result?.total_cost
 					? result.total_cost / result.tasks_completed
 					: 0,
 			lines_per_dollar:
-				result?.total_cost > 0 ? result.total_lines / result.total_cost : 0,
+				result?.total_cost && result?.total_lines
+					? result.total_lines / result.total_cost
+					: 0,
 		};
 	}
 
 	// Get quality gates status
-	getQualityGates() {
+	getQualityGates(): QualityGates {
 		const successRate = this.db
 			.prepare(
 				`
@@ -86,7 +101,7 @@ export class PicardDB {
       WHERE completed_at > datetime('now', '-1 hour')
     `,
 			)
-			.get() as any;
+			.get() as RateResult | undefined;
 
 		const errorRate = this.db
 			.prepare(
@@ -97,7 +112,7 @@ export class PicardDB {
       WHERE timestamp > datetime('now', '-1 hour')
     `,
 			)
-			.get() as any;
+			.get() as RateResult | undefined;
 
 		const success = successRate?.rate || 0;
 		const error = errorRate?.rate || 0;
@@ -110,7 +125,7 @@ export class PicardDB {
 	}
 
 	// Get recent events
-	getRecentEvents(limit: number = 10) {
+	getRecentEvents(limit: number = 10): Event[] {
 		return this.db
 			.prepare(
 				`
@@ -120,11 +135,11 @@ export class PicardDB {
       LIMIT ?
     `,
 			)
-			.all(limit);
+			.all(limit) as Event[];
 	}
 
 	// Get active tasks
-	getActiveTasks() {
+	getActiveTasks(): Task[] {
 		return this.db
 			.prepare(
 				`
@@ -141,18 +156,18 @@ export class PicardDB {
       LIMIT 10
     `,
 			)
-			.all();
+			.all() as Task[];
 	}
 
 	// Get all projects
-	getProjects() {
+	getProjects(): unknown[] {
 		return this.db
 			.prepare(`SELECT * FROM v_project_dashboard ORDER BY last_activity DESC`)
 			.all();
 	}
 
 	// Get all loadouts
-	getLoadouts() {
+	getLoadouts(): unknown[] {
 		return this.db
 			.prepare(`SELECT * FROM v_loadout_performance ORDER BY times_used DESC`)
 			.all();

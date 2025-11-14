@@ -8,6 +8,7 @@
 import { Box, render, Text } from "ink";
 import { useEffect, useState } from "react";
 import { PicardDB } from "./db.js";
+import type { DashboardData } from "./types.js";
 
 const BANNER = `
     ██████╗ ██╗ ██████╗ █████╗ ██████╗ ██████╗
@@ -22,7 +23,7 @@ const BANNER = `
 `;
 
 function Dashboard() {
-	const [data, setData] = useState<any>(null);
+	const [data, setData] = useState<DashboardData | null>(null);
 	const db = new PicardDB();
 
 	useEffect(() => {
@@ -95,7 +96,7 @@ function Dashboard() {
 								</Text>
 								<Box marginTop={1}>
 									{agents.length > 0 ? (
-										agents.map((agent: any) => (
+										agents.map((agent) => (
 											<Text key={agent.agent_id}>
 												{agent.agent_name || agent.agent_id} | {agent.status} |
 												Tasks: {agent.active_tasks}
@@ -116,7 +117,7 @@ function Dashboard() {
 								</Text>
 								<Box marginTop={1}>
 									{tasks.length > 0 ? (
-										tasks.slice(0, 5).map((task: any) => (
+										tasks.slice(0, 5).map((task) => (
 											<Text key={task.task_id}>
 												{task.task_name} | {task.priority || "MED"} |{" "}
 												{task.status}
@@ -187,8 +188,8 @@ function Dashboard() {
 								</Text>
 								<Box marginTop={1}>
 									{events.length > 0 ? (
-										events.map((event: any, i: number) => (
-											<Text key={i} dimColor>
+										events.map((event) => (
+											<Text key={event.timestamp} dimColor>
 												[{event.agent_id?.substring(0, 12)}] {event.event_type}
 											</Text>
 										))
