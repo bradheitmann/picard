@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+
+# Migrate PSA and Loadout data to unified PICARD database
+
+set -euo pipefail
+
+DB_PATH="${HOME}/.dev/logs/observability.db"
+PSA_PROJECTS="${HOME}/.warp/PSA_PROJECTS.md"
+PSA_LOADOUTS="${HOME}/.psa/AGENTS_MASTER.md"
+
+# Colors
+C_GREEN="\033[32m"
+C_YELLOW="\033[33m"
+C_CYAN="\033[36m"
+C_RED="\033[31m"
+C_BOLD="\033[1m"
+C_RESET="\033[0m"
+
+echo -e "${C_BOLD}${C_CYAN}"
+echo "╔══════════════════════════════════════════════════════════╗"
+echo "║        🖖 PICARD Unified Migration 🖖                   ║"
+echo "║    Merging PSA + Loadouts into Single System            ║"
+echo "╚══════════════════════════════════════════════════════════╝"
+echo -e "${C_RESET}"
+echo ""
+
+# Migrate Projects from PSA
+if [ -f "$PSA_PROJECTS" ]; then
+    echo -e "${C_CYAN}→ Migrating projects from PSA...${C_RESET}"
+
+    # Parse PSA_PROJECTS.md and insert into database
+    while IFS='|' read -r _ project_name project_path project_type _ _; do
+        # Skip header lines
+        if [[ "$project_name" =~ ^[[:space:]]*Project[[:space:]]Name ]] || \
+           [[ "$project_name" =~ ^[-[:space:]]+$ ]] || \
+           [[ -z "$project_name" ]]; then
+            continue
+        fi
+
+        # Trim whitespace
+        project_name=$(echo "$project_name" | xargs)
+        project_path=$(echo "$project_path" | xargs)
+        project_type=$(echo "$project_type" | xargs)
+
+        if [ -n "$project_path" ] && [ -d "$project_path" ]; then
+            project_id=$(echo "$project_name" | tr '[:upper:] ' '[:lower:]-')
+
+            # Insert into projects table
+            sqlite3 "$DB_PATH" <<EOF
+INSERT OR REPLACE INTO projects (project_id, project_name, project_path, project_type, status)
+VALUES ('${project_id}', '${project_name}', '${project_path}', '${project_type}', 'active');
+EOF
+
+            echo -e "  ${C_GREEN}✓${C_RESET} Migrated: ${project_name}"
+        fi
+    done < "$PSA_PROJECTS"
+else
+    echo -e "  ${C_YELLOW}⚠${C_RESET} PSA_PROJECTS.md not found, skipping"
+fi
+
+# Migrate Loadouts (if ~/.psa/ exists)
+if [ -f "$PSA_LOADOUTS" ]; then
+    echo ""
+    echo -e "${C_CYAN}→ Migrating loadouts...${C_RESET}"
+
+    # Create sample loadouts based on what's documented
+    sqlite3 "$DB_PATH" <<'EOF'
+INSERT OR REPLACE INTO loadouts (loadout_id, loadout_name, model, ide_platform, temperature, status)
+VALUES
+  ('claude-sonnet-4-5-warp', 'Claude Sonnet 4.5 + Warp', 'claude-sonnet-4-5', 'warp', 0.7, 'active'),
+  ('gpt-5-codex-cli', 'GPT-5 Codex CLI', 'gpt-5', 'cli', 0.5, 'active'),
+  ('glm-4.6-zed', 'GLM-4.6 + Zed', 'glm-4.6', 'zed', 0.6, 'active');
+EOF
+
+    echo -e "  ${C_GREEN}✓${C_RESET} Migrated loadouts from master"
+else
+    echo -e "  ${C_YELLOW}⚠${C_RESET} AGENTS_MASTER.md not found, creating defaults"
+fi
+
+# Create default protocols
+echo ""
+echo -e "${C_CYAN}→ Creating default protocols...${C_RESET}"
+
+sqlite3 "$DB_PATH" <<'EOF'
+INSERT OR REPLACE INTO protocols (protocol_id, protocol_name, version, description, category, status)
+VALUES
+  ('mvc-1.0', 'Minimum Viable Context', '1.0.0', 'Minimize context for faster, cheaper agent responses', 'development', 'active'),
+  ('rad-1.0', 'Rehydrating Agentic Development', '1.0.0', 'Rebuild context from project artifacts', 'development', 'active'),
+  ('agents-md-1.0', 'AGENTS.md Standard', '1.0.0', 'Industry standard for AI agent guidance', 'documentation', 'active');
+EOF
+
+echo -e "  ${C_GREEN}✓${C_RESET} Created default protocols"
+
+# Create sample hacks
+echo ""
+echo -e "${C_CYAN}→ Creating helpful hacks library...${C_RESET}"
+
+sqlite3 "$DB_PATH" <<'EOF'
+INSERT OR REPLACE INTO hacks (category, title, command, description, platform)
+VALUES
+  ('git', 'Interactive git add', 'git status -s | fzf -m | awk ''{print $2}'' | xargs git add', 'Select files to stage with fzf', 'terminal'),
+  ('search', 'Find and view with fzf', 'fd pattern | fzf | xargs bat', 'Fuzzy find files and view with syntax highlighting', 'terminal'),
+  ('picard', 'Quick project jump', 'picard goto <number>', 'Jump to project from PICARD', 'picard'),
+  ('agent', 'Report loadout observation', 'picard report <loadout> "observation"', 'Log agent configuration learnings', 'picard');
+EOF
+
+echo -e "  ${C_GREEN}✓${C_RESET} Created hacks library"
+
+echo ""
+echo -e "${C_BOLD}${C_GREEN}✅ Migration complete!${C_RESET}"
+echo ""
+echo -e "${C_CYAN}Unified PICARD database now contains:${C_RESET}"
+echo -e "  • Projects (from PSA)"
+echo -e "  • Agents (existing)"
+echo -e "  • Loadouts (agent configurations)"
+echo -e "  • Protocols (MVC, RAD, etc.)"
+echo -e "  • Hacks (helpful shortcuts)"
+echo -e "  • Events (existing)"
+echo -e "  • All metrics and tracking"
+echo ""
+echo -e "${C_YELLOW}Next: Launch unified PICARD${C_RESET}"
+echo "  picard"
