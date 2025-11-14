@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { PicardDB } from "../db.js";
 import type { DashboardData } from "../types.js";
 import { AgentsView } from "./AgentsView.js";
+import { AlertsBanner } from "./AlertsBanner.js";
 import { HelpModal } from "./HelpModal.js";
 import { LoadoutsView } from "./LoadoutsView.js";
 import { ProjectsView } from "./ProjectsView.js";
@@ -99,6 +100,9 @@ export const Dashboard: FC = () => {
 					{BANNER}
 				</Text>
 			</Box>
+
+			{/* Alerts */}
+			<AlertsBanner gates={data.gates} context={data.context} />
 
 			{/* Tab Bar */}
 			<Box marginTop={1} marginBottom={1}>

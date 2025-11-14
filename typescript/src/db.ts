@@ -33,7 +33,7 @@ interface RateResult {
 }
 
 export class PicardDB {
-	private db: Database;
+	public db: Database; // Public for CLI access
 
 	constructor(dbPath: string = DB_PATH) {
 		this.db = new Database(dbPath);
