@@ -6,7 +6,17 @@
 import { Database } from "bun:sqlite";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import type { Agent, Event, QualityGates, ROIMetrics, Task } from "./types";
+import type {
+	Agent,
+	ContextUsage,
+	Event,
+	Loadout,
+	Project,
+	QualityGates,
+	ROIMetrics,
+	Task,
+	TeamPerformance,
+} from "./types";
 
 const DB_PATH = join(homedir(), ".dev/logs/observability.db");
 
@@ -159,18 +169,51 @@ export class PicardDB {
 			.all() as Task[];
 	}
 
+	// Get context usage
+	getContextUsage(): ContextUsage[] {
+		return this.db
+			.prepare(
+				`
+      SELECT agent_id, AVG(input_tokens) as avg_input,
+             MAX(input_tokens) as max_input, context_window
+      FROM token_usage
+      WHERE datetime(timestamp) > datetime('now', '-1 hour')
+      GROUP BY agent_id
+      ORDER BY avg_input DESC
+    `,
+			)
+			.all() as ContextUsage[];
+	}
+
+	// Get team performance
+	getTeamPerformance(): TeamPerformance[] {
+		return this.db
+			.prepare(
+				`
+      SELECT t.team_id, COUNT(DISTINCT ts.agent_id) as team_size,
+             COUNT(DISTINCT ts.task_id) as tasks_completed,
+             AVG(ts.duration_ms) / 1000.0 as avg_task_time_sec
+      FROM teams t
+      LEFT JOIN tasks ts ON t.team_id = ts.team_id
+      WHERE ts.completed_at > datetime('now', '-24 hours') AND ts.outcome = 'success'
+      GROUP BY t.team_id
+    `,
+			)
+			.all() as TeamPerformance[];
+	}
+
 	// Get all projects
-	getProjects(): unknown[] {
+	getProjects(): Project[] {
 		return this.db
 			.prepare(`SELECT * FROM v_project_dashboard ORDER BY last_activity DESC`)
-			.all();
+			.all() as Project[];
 	}
 
 	// Get all loadouts
-	getLoadouts(): unknown[] {
+	getLoadouts(): Loadout[] {
 		return this.db
 			.prepare(`SELECT * FROM v_loadout_performance ORDER BY times_used DESC`)
-			.all();
+			.all() as Loadout[];
 	}
 
 	close() {
