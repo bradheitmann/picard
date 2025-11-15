@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# PICARD v2.1 - Simple & Usable
-# Non-blocking CLI (like PSA, but better)
+# PICARD v2.1 - Beginner-Friendly Interface
 
 BUN="${HOME}/.bun/bin/bun"
-PICARD_SIMPLE="${HOME}/.dev-ts/src/picard-simple.ts"
+INTERACTIVE="${HOME}/.dev-ts/src/guided-menu.ts"
+PICARD_CLI="${HOME}/.dev-ts/src/picard-simple.ts"
 
 # Check if bun is installed
 if [ ! -f "$BUN" ]; then
@@ -14,5 +14,10 @@ if [ ! -f "$BUN" ]; then
     exit 1
 fi
 
-# Always run simple CLI (never blocks terminal)
-exec "$BUN" run "$PICARD_SIMPLE" "$@"
+# If no arguments, show interactive friendly interface
+if [ $# -eq 0 ]; then
+    exec "$BUN" run "$INTERACTIVE"
+else
+    # With arguments, run CLI
+    exec "$BUN" run "$PICARD_CLI" "$@"
+fi
