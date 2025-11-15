@@ -6,6 +6,7 @@
 import { Database } from "bun:sqlite";
 import { homedir } from "node:os";
 import { join } from "node:path";
+import { validatePayloadSize } from "./security/validation.js";
 import type {
 	Agent,
 	ContextUsage,
@@ -19,7 +20,6 @@ import type {
 	Task,
 	TeamPerformance,
 } from "./types";
-import { validatePayloadSize } from "./security/validation.js";
 
 const DB_PATH = join(homedir(), ".dev/logs/observability.db");
 

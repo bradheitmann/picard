@@ -72,7 +72,7 @@ export function sanitizeShellArg(arg: string): string {
 	}
 
 	// Remove ALL dangerous shell characters including /
-	return arg.replace(/[;&|`$()<>\/\\*?[\]{}!]/g, "");
+	return arg.replace(/[;&|`$()<>/\\*?[\]{}!]/g, "");
 }
 
 /**

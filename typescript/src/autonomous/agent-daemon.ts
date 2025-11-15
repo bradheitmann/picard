@@ -9,10 +9,10 @@
  * - NO HUMAN IN THE LOOP
  */
 
-import { MessageBroker } from "../message-broker.js";
-import { PicardDB } from "../db.js";
 import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
+import { PicardDB } from "../db.js";
+import { MessageBroker } from "../message-broker.js";
 
 interface AgentDaemonConfig {
 	agent_id: string;
@@ -64,7 +64,9 @@ export class AgentDaemon {
 			for (const message of messages) {
 				// Check if we can execute (not at max capacity)
 				if (this.activeTasks.size >= this.config.max_concurrent_tasks) {
-					console.log(`⏸️  Agent ${this.config.agent_id} at capacity, queueing...`);
+					console.log(
+						`⏸️  Agent ${this.config.agent_id} at capacity, queueing...`,
+					);
 					break;
 				}
 
@@ -140,10 +142,14 @@ export class AgentDaemon {
 				await this.writeTaskFile(task_id, specification);
 
 				// Trigger agent execution
-				const result = spawn(bridge, ["execute_task", this.config.agent_id, task_id], {
-					cwd: this.config.project_path,
-					stdio: "inherit",
-				});
+				const result = spawn(
+					bridge,
+					["execute_task", this.config.agent_id, task_id],
+					{
+						cwd: this.config.project_path,
+						stdio: "inherit",
+					},
+				);
 
 				await new Promise((resolve) => result.on("exit", resolve));
 
@@ -198,24 +204,36 @@ export class AgentDaemon {
 
 			if (passed && coverage >= coverage_required) {
 				// APPROVE: Send to PM
-				await this.broker.sendMessage(this.config.agent_id, "pm-agent-001", "notification", {
-					action: "task_completed",
-					task_id,
-					status: "APPROVED",
-					test_results: { passed: true, coverage },
-				});
+				await this.broker.sendMessage(
+					this.config.agent_id,
+					"pm-agent-001",
+					"notification",
+					{
+						action: "task_completed",
+						task_id,
+						status: "APPROVED",
+						test_results: { passed: true, coverage },
+					},
+				);
 
 				console.log(`   ✅ Tests PASSED → Approved, notified PM`);
 			} else {
 				// REJECT: Send back to Dev (ADVERSARIAL)
-				await this.broker.sendMessage(this.config.agent_id, "dev-agent-001", "command", {
-					action: "fix_issues",
-					task_id,
-					failures: this.extractFailures(output),
-					severity: "high",
-				});
+				await this.broker.sendMessage(
+					this.config.agent_id,
+					"dev-agent-001",
+					"command",
+					{
+						action: "fix_issues",
+						task_id,
+						failures: this.extractFailures(output),
+						severity: "high",
+					},
+				);
 
-				console.log(`   ❌ Tests FAILED → Rejected, sent back to Dev (adversarial)`);
+				console.log(
+					`   ❌ Tests FAILED → Rejected, sent back to Dev (adversarial)`,
+				);
 			}
 		} finally {
 			this.activeTasks.delete(task_id);
