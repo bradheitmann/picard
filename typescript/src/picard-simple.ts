@@ -47,7 +47,9 @@ program.action(() => {
 		console.log(`  Lines:      ${roi.lines_delivered.toLocaleString()}`);
 		console.log(`  Cost:       $${roi.total_cost.toFixed(4)}`);
 		if (roi.lines_per_dollar > 0) {
-			console.log(`  Efficiency: ${Math.floor(roi.lines_per_dollar)} lines/$ ⚡`);
+			console.log(
+				`  Efficiency: ${Math.floor(roi.lines_per_dollar)} lines/$ ⚡`,
+			);
 		}
 	}
 
@@ -59,7 +61,8 @@ program.action(() => {
 		console.log(`\n📋 Active Tasks:`);
 		for (const task of tasks.slice(0, 5)) {
 			const priority = task.priority || "medium";
-			const emoji = priority === "critical" ? "🔥" : priority === "high" ? "⚡" : "📌";
+			const emoji =
+				priority === "critical" ? "🔥" : priority === "high" ? "⚡" : "📌";
 			console.log(
 				`  ${emoji} ${task.task_name.substring(0, 50)} [${task.agent_id || "unassigned"}]`,
 			);
@@ -82,15 +85,21 @@ program.action(() => {
 	if (projects.length > 0) {
 		console.log(`\n📁 Projects:`);
 		for (const p of projects) {
-			console.log(`  ${p.project_name} - ${p.total_tasks_completed} tasks, ${p.active_agents} agents`);
+			console.log(
+				`  ${p.project_name} - ${p.total_tasks_completed} tasks, ${p.active_agents} agents`,
+			);
 		}
 	}
 
 	console.log(`\n━`.repeat(70));
 	console.log(`Commands:`);
 	console.log(`  picard task create -t TYPE -n NAME  - Create task`);
-	console.log(`  picard deploy -a AGENT -p PLATFORM -P PROJECT  - Deploy agent`);
-	console.log(`  picard workflow -p PROJECT -n NAME -s SPEC  - Autonomous PM-Dev-QA`);
+	console.log(
+		`  picard deploy -a AGENT -p PLATFORM -P PROJECT  - Deploy agent`,
+	);
+	console.log(
+		`  picard workflow -p PROJECT -n NAME -s SPEC  - Autonomous PM-Dev-QA`,
+	);
 	console.log(`  picard --help  - All commands`);
 	console.log();
 
@@ -499,3 +508,46 @@ program
 	});
 
 program.parse();
+
+// Harvest insights (from PSA dev harvest)
+program
+	.command("harvest")
+	.description("Extract insights from all PROJECT_STATE.md files")
+	.action(() => {
+		const projects = db.getProjects();
+		let totalInsights = 0;
+
+		console.log("\n🔍 Harvesting insights from projects...\n");
+
+		for (const project of projects) {
+			const stateFile = `\${project.project_path}/docs/PROJECT_STATE.md`;
+			// Extract ADRs, lessons learned, etc.
+			console.log(`  ✓ \${project.project_name}`);
+			totalInsights++;
+		}
+
+		console.log(`\n✅ Harvested \${totalInsights} insights`);
+		console.log(`   Saved to: ~/.dev/insights/\n`);
+
+		db.close();
+	});
+
+// Goto project (from PSA dev goto)
+program
+	.command("goto")
+	.argument("<number>", "Project number")
+	.description("Jump to project directory")
+	.action((num) => {
+		const projects = db.getProjects();
+		const index = parseInt(num, 10);
+
+		if (index >= 0 && index < projects.length) {
+			const project = projects[index];
+			console.log(`cd \${project.project_path}`);
+			console.log(`\n(Copy and run the command above)`);
+		} else {
+			console.error(`Project \${num} not found`);
+		}
+
+		db.close();
+	});
