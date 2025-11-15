@@ -71,7 +71,7 @@ export class MessageBroker {
 	getPendingMessages(agentId: string): Message[] {
 		const rows = this.db
 			.prepare(
-				`SELECT id, from_agent as from, to_agent as to, message_type as type,
+				`SELECT id, from_agent, to_agent, message_type,
                 payload_json, timestamp, status
          FROM messages
          WHERE to_agent = ? AND status = 'pending'
@@ -81,9 +81,9 @@ export class MessageBroker {
 
 		return rows.map((row: any) => ({
 			id: row.id,
-			from: row.from,
-			to: row.to,
-			type: row.type,
+			from: row.from_agent,
+			to: row.to_agent,
+			type: row.message_type,
 			payload: JSON.parse(row.payload_json || "{}"),
 			timestamp: row.timestamp,
 			status: row.status,
