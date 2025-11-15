@@ -71,8 +71,8 @@ export function sanitizeShellArg(arg: string): string {
 		throw new Error("Argument must be a string");
 	}
 
-	// Remove all shell metacharacters
-	return arg.replace(/[;&|`$()<>]/g, "");
+	// Remove ALL dangerous shell characters including /
+	return arg.replace(/[;&|`$()<>\/\\*?[\]{}!]/g, "");
 }
 
 /**

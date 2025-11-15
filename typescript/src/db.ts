@@ -19,6 +19,7 @@ import type {
 	Task,
 	TeamPerformance,
 } from "./types";
+import { validatePayloadSize } from "./security/validation.js";
 
 const DB_PATH = join(homedir(), ".dev/logs/observability.db");
 
