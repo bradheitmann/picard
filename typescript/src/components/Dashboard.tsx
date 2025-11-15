@@ -5,7 +5,7 @@
 
 import { Box, Text, useInput } from "ink";
 import type { FC } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PicardDB } from "../db.js";
 import type { DashboardData } from "../types.js";
 import { AgentsView } from "./AgentsView.js";
@@ -34,7 +34,9 @@ export const Dashboard: FC = () => {
 	const [currentView, setCurrentView] = useState<View>("agents");
 	const [showHelp, setShowHelp] = useState(false);
 	const [data, setData] = useState<DashboardData | null>(null);
-	const db = new PicardDB();
+
+	// CRITICAL FIX: Create db instance once using useMemo (stable reference)
+	const db = useMemo(() => new PicardDB(), []);
 
 	// Keyboard input handling
 	useInput((input, key) => {
