@@ -349,6 +349,18 @@ program
 		db.close();
 	});
 
+// Workflow commands
+program
+	.command("workflow")
+	.description("Launch PM-Dev-QA workflow")
+	.requiredOption("-p, --project <id>", "Project ID")
+	.requiredOption("-n, --name <name>", "Task name")
+	.requiredOption("-s, --spec <spec>", "Specification")
+	.action(async (options) => {
+		const { launchPMDevQAWorkflow } = await import("./workflows/pm-dev-qa.js");
+		await launchPMDevQAWorkflow(options.project, options.name, options.spec);
+	});
+
 // Status command
 program
 	.command("status")
