@@ -91,7 +91,7 @@ program.action(() => {
 		}
 	}
 
-	console.log(`\n━`.repeat(70));
+	console.log("\n" + "━".repeat(70));
 	console.log(`Commands:`);
 	console.log(`  picard task create -t TYPE -n NAME  - Create task`);
 	console.log(
