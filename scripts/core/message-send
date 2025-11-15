@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# PICARD Message Broker (Pure Bash)
+# Agents communicate via files (simple, reliable)
+
+set -euo pipefail
+
+FROM="$1"
+TO="$2"
+TYPE="$3"
+MESSAGE="$4"
+
+MESSAGES_DIR="${HOME}/.dev/messages"
+mkdir -p "$MESSAGES_DIR/$TO"
+
+# Create message file
+MESSAGE_ID="msg_$(date +%s)_$(openssl rand -hex 4)"
+MESSAGE_FILE="$MESSAGES_DIR/$TO/$MESSAGE_ID.json"
+
+# Write message as JSON
+cat > "$MESSAGE_FILE" <<EOF
+{
+  "id": "$MESSAGE_ID",
+  "from": "$FROM",
+  "to": "$TO",
+  "type": "$TYPE",
+  "message": "$MESSAGE",
+  "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+  "status": "pending"
+}
+EOF
+
+echo "✓ Message sent: $FROM → $TO"
+echo "  Type: $TYPE"
+echo "  ID: $MESSAGE_ID"

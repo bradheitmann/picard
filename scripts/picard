@@ -1,23 +1,56 @@
 #!/usr/bin/env bash
-# PICARD v2.1 - Beginner-Friendly Interface
+# PICARD v3.0 - Pure Bash (Simple & Reliable)
+# Built on PSA foundation + adds multi-agent features
 
-BUN="${HOME}/.bun/bin/bun"
-INTERACTIVE="${HOME}/.dev-ts/src/guided-menu.ts"
-PICARD_CLI="${HOME}/.dev-ts/src/picard-simple.ts"
+PICARD_HOME="${HOME}/.dev/picard-bash"
+PSA_GLOBAL="${HOME}/.warp/scripts/psa-global-dashboard.sh"
+DB="${HOME}/.dev/logs/observability.db"
 
-# Check if bun is installed
-if [ ! -f "$BUN" ]; then
-    echo "🖖 PICARD requires Bun"
-    echo ""
-    echo "Install: curl -fsSL https://bun.sh/install | bash"
-    echo "Then: exec \$SHELL"
-    exit 1
-fi
+# Colors
+C_CYAN="\033[36m"
+C_RESET="\033[0m"
 
-# If no arguments, show interactive friendly interface
+# Default: Show PSA dashboard (works great!)
 if [ $# -eq 0 ]; then
-    exec "$BUN" run "$INTERACTIVE"
-else
-    # With arguments, run CLI
-    exec "$BUN" run "$PICARD_CLI" "$@"
+  # Add PICARD logo to PSA
+  echo -e "${C_CYAN}"
+  echo "    ██████╗ ██╗ ██████╗ █████╗ ██████╗ ██████╗"
+  echo "    ██╔══██╗██║██╔════╝██╔══██╗██╔══██╗██╔══██╗"
+  echo "    ██████╔╝██║██║     ███████║██████╔╝██║  ██║"
+  echo "    ██╔═══╝ ██║██║     ██╔══██║██╔══██╗██║  ██║"
+  echo "    ██║     ██║╚██████╗██║  ██║██║  ██║██████╔╝"
+  echo "    ╚═╝     ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝"
+  echo "    🖖 Multi-Agent Orchestration + Project State Awareness"
+  echo -e "${C_RESET}"
+  echo ""
+  exec "$PSA_GLOBAL"
 fi
+
+# Route commands
+case "$1" in
+  # PSA commands (use originals)
+  init|new-project)
+    exec ~/.warp/scripts/init-project.sh "${@:2}"
+    ;;
+
+  # PICARD message broker (bash)
+  send-message|msg)
+    exec "$PICARD_HOME/scripts/core/message-send" "${@:2}"
+    ;;
+
+  # PICARD workflow (bash)
+  workflow|pm-dev-qa)
+    exec "$PICARD_HOME/scripts/workflows/pm-dev-qa" "${@:2}"
+    ;;
+
+  # Database commands (sqlite3)
+  task)
+    exec "$PICARD_HOME/scripts/core/task-manager" "${@:2}"
+    ;;
+
+  *)
+    echo "Unknown command: $1"
+    echo "Run 'picard' for menu"
+    exit 1
+    ;;
+esac

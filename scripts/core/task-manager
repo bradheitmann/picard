@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# PICARD Task Manager (Pure Bash + SQLite)
+
+set -euo pipefail
+
+DB="${HOME}/.dev/logs/observability.db"
+ACTION="${1:-list}"
+
+case "$ACTION" in
+  create)
+    TASK_NAME="${2:?Task name required}"
+    PRIORITY="${3:-medium}"
+    TASK_ID="task_$(date +%s)_$(openssl rand -hex 4)"
+
+    sqlite3 "$DB" <<EOF
+INSERT INTO tasks (task_id, agent_id, session_id, task_name, status, priority, claimed_at)
+VALUES ('$TASK_ID', 'unassigned', 'sess_$(date +%s)', '$TASK_NAME', 'pending', '$PRIORITY', CURRENT_TIMESTAMP);
+EOF
+
+    echo "✓ Task created: $TASK_NAME"
+    echo "  ID: $TASK_ID"
+    echo "  Priority: $PRIORITY"
+    ;;
+
+  list)
+    echo "📋 Tasks:"
+    sqlite3 -column -header "$DB" "SELECT task_id, task_name, status, priority, agent_id FROM tasks ORDER BY claimed_at DESC LIMIT 20"
+    ;;
+
+  assign)
+    TASK_ID="$2"
+    AGENT_ID="$3"
+    sqlite3 "$DB" "UPDATE tasks SET agent_id='$AGENT_ID', status='assigned' WHERE task_id='$TASK_ID'"
+    echo "✓ Task $TASK_ID assigned to $AGENT_ID"
+    ;;
+
+  *)
+    echo "Usage: task-manager {create|list|assign} [args]"
+    exit 1
+    ;;
+esac

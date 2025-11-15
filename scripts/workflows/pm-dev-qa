@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# PM-Dev-QA Workflow (Pure Bash)
+# Autonomous multi-agent coordination
+
+set -euo pipefail
+
+DB="${HOME}/.dev/logs/observability.db"
+MESSAGES_DIR="${HOME}/.dev/messages"
+PROJECT="$1"
+TASK_NAME="$2"
+SPEC="$3"
+
+echo "🖖 PM-Dev-QA Workflow Starting"
+echo "━".repeat(60)
+
+# Step 1: PM creates spec
+TASK_ID="task_$(date +%s)_$(openssl rand -hex 4)"
+
+sqlite3 "$DB" <<EOF
+INSERT INTO tasks (task_id, agent_id, session_id, task_name, status, priority, claimed_at)
+VALUES ('$TASK_ID', 'pm-agent', 'sess_$(date +%s)', '$TASK_NAME', 'spec_created', 'high', CURRENT_TIMESTAMP);
+EOF
+
+# Send message to Dev
+~/.dev/picard-bash/scripts/core/message-send "pm-agent" "dev-agent" "command" "implement:$SPEC"
+
+echo "✓ Workflow initiated"
+echo "  PM created spec → Dev will implement → QA will test"
+echo "  Task ID: $TASK_ID"
+echo "  Monitor: picard"
