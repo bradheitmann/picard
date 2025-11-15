@@ -110,44 +110,48 @@ export const Dashboard: FC = () => {
 
 			{/* Tab Bar */}
 			<Box marginTop={1} marginBottom={1}>
-				<Text>
-					[
+				<Box flexDirection="row" gap={1}>
+					<Text>[</Text>
 					<Text
 						color={currentView === "agents" ? "yellow" : "dim"}
 						bold={currentView === "agents"}
 					>
 						1:Agents
 					</Text>
-					] [
+					<Text>] [</Text>
 					<Text
 						color={currentView === "projects" ? "yellow" : "dim"}
 						bold={currentView === "projects"}
 					>
 						2:Projects
 					</Text>
-					] [
+					<Text>] [</Text>
 					<Text
 						color={currentView === "loadouts" ? "yellow" : "dim"}
 						bold={currentView === "loadouts"}
 					>
 						3:Loadouts
 					</Text>
-					] [
+					<Text>] [</Text>
 					<Text
 						color={currentView === "protocols" ? "yellow" : "dim"}
 						bold={currentView === "protocols"}
 					>
 						4:Protocols
 					</Text>
-					] [
+					<Text>] [</Text>
 					<Text
 						color={currentView === "hacks" ? "yellow" : "dim"}
 						bold={currentView === "hacks"}
 					>
 						5:Hacks
 					</Text>
-					] [<Text dimColor>h:Help</Text>] [<Text dimColor>q:Quit</Text>]
-				</Text>
+					<Text>] [</Text>
+					<Text dimColor>h:Help</Text>
+					<Text>] [</Text>
+					<Text dimColor>q:Quit</Text>
+					<Text>]</Text>
+				</Box>
 			</Box>
 
 			{/* Content */}

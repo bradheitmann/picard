@@ -6,13 +6,14 @@
  * Receives events from all agents and stores in SQLite
  */
 
-import { existsSync } from "node:fs";
-import { appendFile, writeFile } from "node:fs/promises";
+import { appendFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { PicardDB } from "./db";
 
-const PORT = process.env.PICARD_PORT ? parseInt(process.env.PICARD_PORT) : 8765;
+const PORT = process.env.PICARD_PORT
+	? parseInt(process.env.PICARD_PORT, 10)
+	: 8765;
 const EVENTS_LOG = join(homedir(), ".dev/logs/events/global-stream.jsonl");
 
 interface PicardEvent {
@@ -187,7 +188,7 @@ Bun.serve({
 
 		// Get recent events
 		if (url.pathname === "/events" && req.method === "GET") {
-			const limit = parseInt(url.searchParams.get("limit") || "100");
+			const limit = parseInt(url.searchParams.get("limit") || "100", 10);
 
 			const events = collector.db.db
 				.prepare(

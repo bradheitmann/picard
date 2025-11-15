@@ -281,7 +281,7 @@ export class AgentDaemon {
 	private extractCoverage(testOutput: string): number {
 		// Extract coverage from test output
 		const match = testOutput.match(/coverage:\s*(\d+)%/);
-		return match ? parseInt(match[1]) : 0;
+		return match ? parseInt(match[1], 10) : 0;
 	}
 
 	private extractFailures(testOutput: string): string[] {
