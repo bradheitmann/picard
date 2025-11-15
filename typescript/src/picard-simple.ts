@@ -360,8 +360,22 @@ projectCmd
 	.action((name, path, options) => {
 		const projectId = name.toLowerCase().replace(/\s+/g, "-");
 
-		// Create project directory
-		execSync(`mkdir -p ${path}`, { stdio: "inherit" });
+		// SECURITY: Validate path before creating directory
+		try {
+			validatePath(path);
+		} catch (error: unknown) {
+			console.error(`✗ Invalid path: ${error instanceof Error ? error.message : String(error)}`);
+			process.exit(1);
+		}
+
+		// Create project directory - SECURITY: Use spawn with array args
+		const mkdirResult = spawn("mkdir", ["-p", path], { stdio: "inherit" });
+		mkdirResult.on("exit", (code) => {
+			if (code !== 0) {
+				console.error("✗ Failed to create directory");
+				process.exit(1);
+			}
+		});
 
 		// Register in database
 		db.db
