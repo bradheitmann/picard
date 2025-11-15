@@ -9,8 +9,13 @@ export const AgentsView: FC<{ data: DashboardData }> = ({ data }) => {
 		<Box flexDirection="row" padding={1}>
 			<Box flexDirection="column" width="50%" marginRight={2}>
 				{/* Agents */}
-				<Box borderStyle="round" borderColor="red" padding={1} marginBottom={1}>
-					<Text color="yellow" bold>
+				<Box
+					borderStyle="round"
+					borderColor="cyan"
+					padding={1}
+					marginBottom={1}
+				>
+					<Text color="cyan" bold>
 						🤖 AGENT FLEET
 					</Text>
 					<Box marginTop={1} flexDirection="column">
@@ -27,8 +32,8 @@ export const AgentsView: FC<{ data: DashboardData }> = ({ data }) => {
 					</Box>
 				</Box>
 				{/* Tasks */}
-				<Box borderStyle="round" borderColor="red" padding={1}>
-					<Text color="yellow" bold>
+				<Box borderStyle="round" borderColor="cyan" padding={1}>
+					<Text color="cyan" bold>
 						📋 TASK QUEUE
 					</Text>
 					<Box marginTop={1} flexDirection="column">
@@ -48,12 +53,12 @@ export const AgentsView: FC<{ data: DashboardData }> = ({ data }) => {
 				{/* ROI */}
 				<Box
 					borderStyle="round"
-					borderColor="yellow"
+					borderColor="magenta"
 					padding={1}
 					marginBottom={1}
 					height={8}
 				>
-					<Text color="yellow" bold>
+					<Text color="cyan" bold>
 						💰 ROI (24H)
 					</Text>
 					<Text>Tasks: {roi.tasks_completed}</Text>
@@ -68,12 +73,12 @@ export const AgentsView: FC<{ data: DashboardData }> = ({ data }) => {
 				{/* Context */}
 				<Box
 					borderStyle="round"
-					borderColor="red"
+					borderColor="cyan"
 					padding={1}
 					marginBottom={1}
 					height={8}
 				>
-					<Text color="yellow" bold>
+					<Text color="cyan" bold>
 						🧠 CONTEXT
 					</Text>
 					{context.length > 0 ? (
@@ -96,12 +101,12 @@ export const AgentsView: FC<{ data: DashboardData }> = ({ data }) => {
 				{/* Quality */}
 				<Box
 					borderStyle="round"
-					borderColor="yellow"
+					borderColor="magenta"
 					padding={1}
 					marginBottom={1}
 					height={6}
 				>
-					<Text color="yellow" bold>
+					<Text color="cyan" bold>
 						🎯 QUALITY
 					</Text>
 					<Text>Success: {(gates.success_rate * 100).toFixed(1)}%</Text>
@@ -111,8 +116,8 @@ export const AgentsView: FC<{ data: DashboardData }> = ({ data }) => {
 					</Text>
 				</Box>
 				{/* Events */}
-				<Box borderStyle="round" borderColor="yellow" padding={1}>
-					<Text color="yellow" bold>
+				<Box borderStyle="round" borderColor="magenta" padding={1}>
+					<Text color="cyan" bold>
 						📊 EVENTS
 					</Text>
 					{events.length > 0 ? (

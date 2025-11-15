@@ -35,7 +35,7 @@ export const AlertsBanner: FC<AlertsBannerProps> = ({ gates, context }) => {
 	}
 
 	return (
-		<Box borderStyle="round" borderColor="red" padding={1} marginBottom={1}>
+		<Box borderStyle="round" borderColor="magenta" padding={1} marginBottom={1}>
 			<Box flexDirection="column">
 				<Text color="red" bold>
 					🚨 ALERTS ({alerts.length})

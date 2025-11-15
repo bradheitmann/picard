@@ -16,17 +16,13 @@ import { LoadoutsView } from "./LoadoutsView.js";
 import { ProjectsView } from "./ProjectsView.js";
 import { ProtocolsView } from "./ProtocolsView.js";
 
-const BANNER = `
-    ██████╗ ██╗ ██████╗ █████╗ ██████╗ ██████╗
-    ██╔══██╗██║██╔════╝██╔══██╗██╔══██╗██╔══██╗
-    ██████╔╝██║██║     ███████║██████╔╝██║  ██║
-    ██╔═══╝ ██║██║     ██╔══██║██╔══██╗██║  ██║
-    ██║     ██║╚██████╗██║  ██║██║  ██║██████╔╝
-    ╚═╝     ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝
-
-    🖖 Project Intelligence, Coordination, And Resource Deployment 🖖
-                        "Make It So"
-`;
+// Gradient logo parts (cyan → magenta → yellow gradient)
+const LOGO_LINE1 = "    ██████╗ ██╗ ██████╗ █████╗ ██████╗ ██████╗";
+const LOGO_LINE2 = "    ██╔══██╗██║██╔════╝██╔══██╗██╔══██╗██╔══██╗";
+const LOGO_LINE3 = "    ██████╔╝██║██║     ███████║██████╔╝██║  ██║";
+const LOGO_LINE4 = "    ██╔═══╝ ██║██║     ██╔══██║██╔══██╗██║  ██║";
+const LOGO_LINE5 = "    ██║     ██║╚██████╗██║  ██║██║  ██║██████╔╝";
+const LOGO_LINE6 = "    ╚═╝     ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝";
 
 type View = "agents" | "projects" | "loadouts" | "protocols" | "hacks";
 
@@ -100,59 +96,83 @@ export const Dashboard: FC = () => {
 
 	return (
 		<Box flexDirection="column">
-			{/* Header */}
-			<Box borderStyle="double" borderColor="red" padding={1}>
-				<Text color="red" bold>
-					{BANNER}
-				</Text>
+			{/* Header - Cyberpunk Gradient Logo */}
+			<Box borderStyle="double" borderColor="cyan" padding={1}>
+				<Box flexDirection="column" alignItems="center">
+					<Text color="cyan" bold>
+						{LOGO_LINE1}
+					</Text>
+					<Text color="blue" bold>
+						{LOGO_LINE2}
+					</Text>
+					<Text color="magenta" bold>
+						{LOGO_LINE3}
+					</Text>
+					<Text color="brightMagenta" bold>
+						{LOGO_LINE4}
+					</Text>
+					<Text color="yellow" bold>
+						{LOGO_LINE5}
+					</Text>
+					<Text color="green" bold>
+						{LOGO_LINE6}
+					</Text>
+					<Text> </Text>
+					<Text color="cyan" italic>
+						🖖 Project Intelligence, Coordination, And Resource Deployment 🖖
+					</Text>
+					<Text color="magenta" italic>
+						"Make It So"
+					</Text>
+				</Box>
 			</Box>
 
 			{/* Alerts */}
 			<AlertsBanner gates={data.gates} context={data.context} />
 
-			{/* Tab Bar */}
+			{/* Tab Bar - Cyberpunk Neon */}
 			<Box marginTop={1} marginBottom={1}>
 				<Box flexDirection="row" gap={1}>
-					<Text>[</Text>
+					<Text color="cyan">[</Text>
 					<Text
-						color={currentView === "agents" ? "yellow" : "dim"}
+						color={currentView === "agents" ? "cyan" : "dim"}
 						bold={currentView === "agents"}
 					>
 						1:Agents
 					</Text>
-					<Text>] [</Text>
+					<Text color="cyan">] [</Text>
 					<Text
-						color={currentView === "projects" ? "yellow" : "dim"}
+						color={currentView === "projects" ? "blue" : "dim"}
 						bold={currentView === "projects"}
 					>
 						2:Projects
 					</Text>
-					<Text>] [</Text>
+					<Text color="cyan">] [</Text>
 					<Text
-						color={currentView === "loadouts" ? "yellow" : "dim"}
+						color={currentView === "loadouts" ? "magenta" : "dim"}
 						bold={currentView === "loadouts"}
 					>
 						3:Loadouts
 					</Text>
-					<Text>] [</Text>
+					<Text color="cyan">] [</Text>
 					<Text
 						color={currentView === "protocols" ? "yellow" : "dim"}
 						bold={currentView === "protocols"}
 					>
 						4:Protocols
 					</Text>
-					<Text>] [</Text>
+					<Text color="cyan">] [</Text>
 					<Text
-						color={currentView === "hacks" ? "yellow" : "dim"}
+						color={currentView === "hacks" ? "green" : "dim"}
 						bold={currentView === "hacks"}
 					>
 						5:Hacks
 					</Text>
-					<Text>] [</Text>
-					<Text dimColor>h:Help</Text>
-					<Text>] [</Text>
-					<Text dimColor>q:Quit</Text>
-					<Text>]</Text>
+					<Text color="cyan">] [</Text>
+					<Text color="brightMagenta">h:Help</Text>
+					<Text color="cyan">] [</Text>
+					<Text color="red">q:Quit</Text>
+					<Text color="cyan">]</Text>
 				</Box>
 			</Box>
 
