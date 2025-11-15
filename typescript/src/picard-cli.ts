@@ -5,10 +5,16 @@
  * TypeScript + Bun version
  */
 
-import { execSync } from "node:child_process";
+import { execSync, spawn } from "node:child_process";
 import { existsSync } from "node:fs";
 import { Command } from "commander";
 import { PicardDB } from "./db.js";
+import {
+	sanitizeShellArg,
+	validateAgentId,
+	validatePath,
+	validateTaskName,
+} from "./security/validation.js";
 import type { Task, Team, TeamMemberCount } from "./types.js";
 
 const program = new Command();
@@ -39,6 +45,18 @@ program
 	.action((options) => {
 		const { agent, platform, project, team } = options;
 
+		// SECURITY: Validate all inputs
+		try {
+			validateAgentId(agent);
+			validatePath(project);
+			if (team) validateAgentId(team);
+		} catch (error: unknown) {
+			console.error(
+				`✗ Validation error: ${error instanceof Error ? error.message : String(error)}`,
+			);
+			process.exit(1);
+		}
+
 		// Validate project exists
 		if (!existsSync(project)) {
 			console.error(`✗ Project not found: ${project}`);
@@ -46,7 +64,7 @@ program
 		}
 
 		// Call platform bridge
-		const bridge = `${process.env.HOME}/.dev/orchestration/bridges/${platform}.sh`;
+		const bridge = `${process.env.HOME}/.dev/orchestration/bridges/${sanitizeShellArg(platform)}.sh`;
 
 		if (!existsSync(bridge)) {
 			console.error(`✗ Platform bridge not found: ${platform}`);
@@ -55,7 +73,21 @@ program
 		}
 
 		console.log(`🚀 Deploying ${agent} to ${platform}...`);
-		execSync(`${bridge} deploy ${agent} ${project}`, { stdio: "inherit" });
+
+		// SECURITY: Use spawn with array args instead of string interpolation
+		const result = spawn(
+			bridge,
+			["deploy", sanitizeShellArg(agent), sanitizeShellArg(project)],
+			{
+				stdio: "inherit",
+			},
+		);
+
+		result.on("exit", (code) => {
+			if (code !== 0) {
+				process.exit(code || 1);
+			}
+		});
 
 		// Record in database
 		const sessionId = `sess_${Date.now()}_${agent}`;
@@ -86,6 +118,16 @@ taskCmd
 		"medium",
 	)
 	.action((options) => {
+		// SECURITY: Validate inputs
+		try {
+			validateTaskName(options.name);
+		} catch (error: unknown) {
+			console.error(
+				`✗ Validation error: ${error instanceof Error ? error.message : String(error)}`,
+			);
+			process.exit(1);
+		}
+
 		const taskId = `task_${Date.now()}_${Math.random().toString(36).substring(7)}`;
 		const sessionId = `sess_${Date.now()}`;
 

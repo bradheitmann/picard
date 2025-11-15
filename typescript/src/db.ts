@@ -39,6 +39,16 @@ export class PicardDB {
 
 	constructor(dbPath: string = DB_PATH) {
 		this.db = new Database(dbPath);
+
+		// SECURITY: Fix database file permissions (owner only)
+		if (process.platform !== "win32") {
+			try {
+				const fs = require("node:fs");
+				fs.chmodSync(dbPath, 0o600); // rw------- (owner only)
+			} catch {
+				// Ignore permission errors
+			}
+		}
 	}
 
 	// Get active agents
