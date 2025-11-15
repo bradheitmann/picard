@@ -507,8 +507,6 @@ program
 		db.close();
 	});
 
-program.parse();
-
 // Harvest insights (from PSA dev harvest)
 program
 	.command("harvest")
@@ -520,13 +518,13 @@ program
 		console.log("\n🔍 Harvesting insights from projects...\n");
 
 		for (const project of projects) {
-			const stateFile = `\${project.project_path}/docs/PROJECT_STATE.md`;
+			const stateFile = `${project.project_path}/docs/PROJECT_STATE.md`;
 			// Extract ADRs, lessons learned, etc.
-			console.log(`  ✓ \${project.project_name}`);
+			console.log(`  ✓ ${project.project_name}`);
 			totalInsights++;
 		}
 
-		console.log(`\n✅ Harvested \${totalInsights} insights`);
+		console.log(`\n✅ Harvested ${totalInsights} insights`);
 		console.log(`   Saved to: ~/.dev/insights/\n`);
 
 		db.close();
@@ -543,11 +541,13 @@ program
 
 		if (index >= 0 && index < projects.length) {
 			const project = projects[index];
-			console.log(`cd \${project.project_path}`);
+			console.log(`cd ${project.project_path}`);
 			console.log(`\n(Copy and run the command above)`);
 		} else {
-			console.error(`Project \${num} not found`);
+			console.error(`Project ${num} not found`);
 		}
 
 		db.close();
 	});
+
+program.parse();
